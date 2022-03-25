@@ -49,9 +49,9 @@ class(df$ended_at)
 
 
 ---------------------------------
-
-#all casual/members
-casualriders <- df %>% filter(member_casual == "casual")
+  
+  #all casual/members
+  casualriders <- df %>% filter(member_casual == "casual")
 memberriders <- df %>% filter(member_casual == "member")
 
 
@@ -68,17 +68,16 @@ df$ridetime <- difftime(df$ended_at,df$started_at, units = "mins")
 
 df$ridetime <- as.period(df$ridetime)
 
-df <- df %>% filter(ridetime > 0)
 
 #To Check if there are Negative Ride times (`started_at` is later than `ended_at`)
 
 df %>% filter(ridetime < 0)
 
-df_no_negative_ridetime <- df %>% filter(ridetime > 0)
+df_avg_ridetime <- df %>% filter(ridetime > 0)
 
-df %>% filter(member_casual == "casual") %>% summarise(mean(ridetime))
+df_avg_ridetime %>% filter(member_casual == "casual") %>% summarise(mean(ridetime))
 
-df %>% filter(member_casual == "member") %>% summarise(mean(ridetime))
+df_avg_ridetime %>% filter(member_casual == "member") %>% summarise(mean(ridetime))
 
 # df %>% filter(ridetime > 20)
 
@@ -88,9 +87,8 @@ casual <- df %>% filter(member_casual == "casual")
 
 member <- df %>% filter(member_casual == "member")
 
-df %>%  filter(member_casual == "")
 
-# Visualize Average ride time
+# Visualize Average ride time (NOT DONE)
 
 
 ggplot(data = df)+
@@ -102,3 +100,17 @@ ggplot(data = df)+
   labs(title = "Average Ride Time: Casual vs. Member")
 
 df %>% filter(is.na(ridetime))
+
+
+# Weekends vs. Weekdays Pie Chart (Members vs. Casual)
+df$day <- weekdays(as.Date(df$started_at))
+
+df$weekday <- df %>% filter(day == "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+df$weekend <- df %>% filter(day == "Saturday", "Sunday")
+
+df %>% ggplot()+
+  geom_line(mapping = aes(x = weekday))+
+  geom_line(mapping = aes(x = weekend))
+
+

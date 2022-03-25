@@ -113,4 +113,6 @@ df %>% ggplot()+
   geom_line(mapping = aes(x = weekday))+
   geom_line(mapping = aes(x = weekend))
 
+disthaversine
+
 

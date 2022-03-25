@@ -48,9 +48,6 @@ class(df$ended_at)
 
 
 
-df$ridelength <- difftime(df$ended_at,df$started_at, units = "mins")
-
-
 ---------------------------------
 
 #all casual/members
@@ -59,7 +56,7 @@ memberriders <- df %>% filter(member_casual == "member")
 
 
 
-#Average Ride Length
+#Average Ride time
 
 df$started_at = as_datetime(df$started_at, tz = "America/Chicago")
 class(df$started_at)
@@ -67,28 +64,41 @@ class(df$started_at)
 df$ended_at = as_datetime(df$ended_at, tz = "America/Chicago")
 class(df$ended_at)
 
-df$ridelength <- difftime(df$ended_at,df$started_at, units = "mins")
+df$ridetime <- difftime(df$ended_at,df$started_at, units = "mins")
 
-df$ridelength <- as.period(ridelength)
+df$ridetime <- as.period(df$ridetime)
 
-df <- df %>% filter(ridelength > 0)
+df <- df %>% filter(ridetime > 0)
 
-#To Check if there are Negative Ride Lengths (`started_at` is later than `ended_at`)
+#To Check if there are Negative Ride times (`started_at` is later than `ended_at`)
 
-df %>% filter(ridelength < 0)
+df %>% filter(ridetime < 0)
 
-df %>% filter(member_casual == "casual") %>% summarise(mean(ridelength))
+df_no_negative_ridetime <- df %>% filter(ridetime > 0)
 
-df %>% filter(member_casual == "member") %>% summarise(mean(ridelength))
+df %>% filter(member_casual == "casual") %>% summarise(mean(ridetime))
 
-df %>% filter(ridelength > 20)
+df %>% filter(member_casual == "member") %>% summarise(mean(ridetime))
 
-avg_ridelength_casual <- df %>% filter(member_casual == "casual")
+# df %>% filter(ridetime > 20)
 
-avg_ridelength_member <- df %>% filter(member_casual == "member")
+# Split data into casual and member
 
-ggplot()+
-  geom_boxplot(mapping = aes(x = avg_ridelength_casual,avg_ridelength_member))
+casual <- df %>% filter(member_casual == "casual")
 
-qplot(x = avg_ridelength_casual, avg_ridelength_member)
+member <- df %>% filter(member_casual == "member")
 
+df %>%  filter(member_casual == "")
+
+# Visualize Average ride time
+
+
+ggplot(data = df)+
+  geom_boxplot(mapping = aes(x = member_casual,y= ridetime, fill = member_casual))+
+  labs(title = "Average Ride Time: Casual vs. Member")
+
+ggplot(data = df)+
+  geom_point(mapping = aes(y= ridetime, color = member_casual))+
+  labs(title = "Average Ride Time: Casual vs. Member")
+
+df %>% filter(is.na(ridetime))

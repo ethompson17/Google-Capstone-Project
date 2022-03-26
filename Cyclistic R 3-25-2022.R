@@ -7,6 +7,7 @@ library("lubridate")
 setwd("C:/Users/ethom/Desktop/Data Analytics/Cyclistic/Dataset Files (Cyclistic)")
 
 
+
 #load dataset
 
 Mar21Data <- read.csv("202103-divvy-tripdata.csv")
@@ -36,6 +37,8 @@ df <- rbind(Mar21Data,Apr21Data,May21Data,Jun21Data,Jul21Data,Aug21Data,Sep21Dat
 head(df)
 
 glimpse(df)
+
+glimpse(df_avg_ridetime)
 
 str(df)
 
@@ -87,9 +90,9 @@ df$ridetime <- as.period(df$ridetime)
 as.numeric(df$ridetime)*60
 
 
-df_avg_ridetime$ridetime = as.numeric(df_avg_ridetime$ridetime)*60
+df_avg_ridetime$ridetime = as.numeric(df_avg_ridetime$ridetime)/60
 
-
+str(df_avg_ridetime$ridetime)
 
 
 
@@ -129,16 +132,13 @@ str(df_avg_ridetime$member_casual)
 
 # Visualize Average ride time (NOT DONE)
 
-ggplot(df_avg_ridetime, aes(x= df_avg_ridetime$member_casual))+
+ggplot(df_avg_ridetime, aes(x= member_casual, y = ridetime))+
   geom_boxplot()
 
-ggplot(data = df_avg_ridetime)+
-  geom_boxplot(mapping = aes(x = member_casual,y= ridetime, fill = member_casual))+
-  labs(title = "Average Ride Time: Casual vs. Member")
+ggplot(data = df_avg_ridetime, aes(x = member_casual, y = ridetime))+
+  geom_boxplot()
 
-ggplot(data = df_avg_ridetime)+
-  geom_point(mapping = aes(y= ridetime, color = member_casual))+
-  labs(title = "Average Ride Time: Casual vs. Member")
+
 
 # Summaries
 df %>% filter(is.na(ridetime))
@@ -146,6 +146,12 @@ df_avg_ridetime %>% summary(ridetime)
 
 df %>% filter(is.na(member_casual))
 df_avg_ridetime %>% summary(member_casual)
+
+df %>% summary(ridetime)
+
+
+str(df)
+
 
 # Summaries per Member/Casual
 
@@ -165,3 +171,27 @@ df %>% ggplot()+
 
 disthaversine
 
+day_member <- df$day %>% filter(member_casual == "member")
+
+df_member <- df %>% filter(member_casual== "member")
+
+
+# Visualize Number of Rides each day of the week
+
+df %>% filter(member_casual == "member") %>% count(member_casual)/7
+
+ggplot(df, aes(x = day))+
+  geom_bar(aes(fill = member_casual), col= "black")+
+  facet_grid(~member_casual)+
+  geom_hline(yintercept = mean(member_casual~day))+
+  scale_y_continuous(labels = scales::comma, breaks = seq(0,550000,50000))+
+  labs(x = "Day", y = "Total Number of Rides", title = "Total Rides Per Day")
+
+
+
+
+df %>% filter(member_casual == "member" | "casual")
+
+glimpse(df$day)
+
+df %>% summary(day~member_casual)

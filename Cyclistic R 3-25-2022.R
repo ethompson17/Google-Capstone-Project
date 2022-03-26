@@ -176,7 +176,7 @@ day_member <- df$day %>% filter(member_casual == "member")
 df_member <- df %>% filter(member_casual== "member")
 
 
-# Visualize Number of Rides each day of the week
+# Visualize Number of Rides each day of the week (TOTAL RIDES PER DAY GRAPH)
 
 df %>% filter(member_casual == "member") %>% count(member_casual)/7
 

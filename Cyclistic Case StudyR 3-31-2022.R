@@ -2,6 +2,7 @@
 library("tidyverse")
 library("janitor")
 library("lubridate")
+library("geosphere")
 
 
 
@@ -113,7 +114,7 @@ class(df$ended_at)
 
 df$ridetime <- difftime(df$ended_at,df$started_at, units = "mins")
 
-
+df$rideduration <- df %>% distHaversine(cbind(start_lng, start_lat), cbind(end_lng, end_lat))
 
 
 
@@ -157,12 +158,13 @@ sort(df_avg_ridetime$ridetime) %>% summary(df_avg_ridetime$ridetime)
 
 
 
-# Filter out Ridetime Outliers above 8 Hours
+# Filter out Ridetime Outliers above 8 Hours ##change from 8 hours to above the outlier
 
 df$ridetime <- df_avg_ridetime %>% filter(0 < df_avg_ridetime$ridetime < 480)
 
 
 glimpse(df)
+
 
 
 
@@ -231,16 +233,20 @@ df_member <- df %>% filter(member_casual== "member")
 df.mean = df_avg_ridetime %>% group_by(member_casual) %>% mutate(ridetime_mean = mean(ridetime))
 
 
+# Number of rides per day column
+df$totalrides = df %>% group_by(member_casual) %>% count(day)
+
+
 # Visualize Number of Rides each day of the week (TOTAL RIDES PER DAY GRAPH)
 
 df %>% filter(member_casual == "member") %>% count(member_casual)/7
 
 ggplot(df, aes(x = day))+
   geom_bar(aes(fill = member_casual), col= "black")+
-  facet_grid(~member_casual)+
   scale_y_continuous(labels = scales::comma, breaks = seq(0,550000,50000))+
   labs(x = "Day", y = "Total Number of Rides", title = "Total Rides Per Day")+
-  geom_hline(yintercept = mean(df_avg_ridetime$ridetime), color = "black")
+  geom_hline(yintercept = mean(day))+
+  facet_grid(~member_casual)
 
 
 
